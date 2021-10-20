@@ -14,6 +14,7 @@ import org.mongodb.scala._
 import org.mongodb.scala.model._
 import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Sorts._
+import org.mongodb.scala.model.Aggregates._
 
 object MTGDB {
   def main(args: Array[String]) {
@@ -136,7 +137,9 @@ object MTGDB {
         println("What Would you like to search for?:" +
           "\n A) Individual Card" +
           "\n B) Group of Cards by Set" +
-          "\n C) All Cards from a Decklist or from Card Catalogue")
+          "\n C) All Cards from a Decklist or from Card Catalogue" +
+          "\n D) All Cards from a Decklist/Card Catalogue sorted by quantity" +
+          "\n E) All Cards from a Decklist/Card Catalgoue projected (Names/ Quantity Only)")
 
         UserInput2= scala.io.StdIn.readLine()
         
@@ -170,6 +173,27 @@ object MTGDB {
            val collection: MongoCollection[Document] = database.getCollection(UserInput3)
            println("Here are the records we could find of this collection: ")
            collection.find().printResults()  
+          }
+
+           //2-4: Sorted Decklist
+          if (UserInput2.equalsIgnoreCase("D")){
+           
+            println("Please enter the name of the deck/collection you would like to look at the sorted list for")
+            UserInput3= scala.io.StdIn.readLine()
+            val collection: MongoCollection[Document] = database.getCollection(UserInput3)
+            collection.find().sort(orderBy(descending("Qty"))).printResults()
+           
+          }
+
+          //2-5: Printing out projected deck
+          if (UserInput2.equalsIgnoreCase("E")){
+           
+            println("Please enter the name of the deck/collection you would like to look for card from a certain set in:")
+            UserInput3= scala.io.StdIn.readLine()
+            val collection: MongoCollection[Document] = database.getCollection(UserInput3)
+            collection.find().projection(fields(include("Name", "Qty"), excludeId())).printResults()
+           
+          
           }
       }
 
